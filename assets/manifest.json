@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "main.js": {
+      "files": [
+        "scripts/vendor/*.js",
+        "scripts/main.js"
+      ],
+      "main": true
+    },
+    "main.css": {
+      "files": [
+        "styles/main.scss"
+      ],
+      "main": true
+    },
+    "data-viz.js": {
+      "files": [
+        "scripts/data-viz.js"
+      ]
+    },
+    "admin.css": {
+      "files": [
+        "styles/admin.scss"
+      ]
+    }
+  },
+  "config": {
+    "devUrl": "http://hhvm.hgv.test"
+  }
+}
