@@ -104,3 +104,14 @@ function single_template($template) {
   }
   return $template;
 }
+
+/**
+ * Default template for data viz embed
+ */
+add_filter( 'embed_template', function($template) {
+  global $post;
+	if ('data-viz' == get_post_type(get_queried_object_id()) && !$template) {
+    $template = realpath(__DIR__ . '/..') . '/templates/embed-data-viz.php';
+  }
+	return $template;
+});

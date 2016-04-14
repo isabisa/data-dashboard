@@ -64,71 +64,70 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
 
   // JSON encode variables to pass to JS
   $json_vars = json_encode($vars);
+} else {
+  $vars['type'] = '';
 }
 ?>
 
-<div class="row data-section <?php if (!empty($vars)) echo 'has-data-viz'; ?>" id="<?php echo $post_name; ?>">
+<div class="row data-section well <?php if (!empty($vars['type'])) echo 'has-data-viz'; ?>" id="<?php echo $post_name; ?>">
   <div class="col-md-3">
     <p class="no-bottom-margin"><?php the_title(); ?></p>
   </div>
 
-  <div class="col-md-9">
-    <?php if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 'pie_chart' || $d['type'] == 'table') {
-      if (!empty($d['data_source'])) {
-        ?>
-
-        <div class="loading" id="viz_png_<?php echo $vars['post_name']; ?>">
-          <?php
-          $upload_dir = wp_upload_dir();
-          $filename = '/data-viz/' . $post_name . '.png';
-          if (file_exists($upload_dir['basedir'] . $filename)) {
-            echo '<img src="' . $upload_dir['baseurl'] . $filename . '" />';
-          }
+  <div class="col-md-9 panel panel-default">
+    <div class="panel-body">
+      <?php if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 'pie_chart' || $d['type'] == 'table') {
+        if (!empty($d['data_source'])) {
           ?>
-          <div class="loader hidden-print"></div>
-        </div>
-        <div class="hidden-print print-no" id="viz_lg_<?php echo $vars['post_name']; ?>"></div>
-        <div class="hidden-print print-no data-viz-chart" id="viz_<?php echo $vars['post_name']; ?>"></div>
 
-        <script type="text/javascript">
-          // <![CDATA[
-            var <?php echo $vars['post_name']; ?> = <?php echo $json_vars; ?>
-          // ]]>
-        </script>
+          <div class="loading" id="viz_png_<?php echo $vars['post_name']; ?>">
+            <?php
+            $upload_dir = wp_upload_dir();
+            $filename = '/data-viz/' . $post_name . '.png';
+            if (file_exists($upload_dir['basedir'] . $filename)) {
+              echo '<img src="' . $upload_dir['baseurl'] . $filename . '" />';
+            }
+            ?>
+            <div class="loader hidden-print"></div>
+          </div>
+          <div class="hidden-print print-no" id="viz_lg_<?php echo $vars['post_name']; ?>"></div>
+          <div class="hidden-print print-no data-viz-chart" id="viz_<?php echo $vars['post_name']; ?>"></div>
 
-        <?php
-      }
-      $tweet = 'Explore ' . $title . ' & more #EdNCData -> ';
-    } elseif ($d['type'] == 'cartodb_map') {
-      echo '<div class="entry-content-asset hidden-print print-no">' . wp_oembed_get($d['cartodb_url']) . '</div>';
-      echo '<img class="visible-print-block" src="' . $d['static_map']['url'] . '" />';
-      $tweet = 'Explore ' . $title . ' & more -> ';
-    } elseif ($d['type'] == 'text') {
+          <script type="text/javascript">
+            // <![CDATA[
+              var <?php echo $vars['post_name']; ?> = <?php echo $json_vars; ?>
+            // ]]>
+          </script>
 
-      echo $d['text-based_data'];
+          <?php
+        }
+        $tweet = 'Explore ' . $title . ' & more -> ';
+      } elseif ($d['type'] == 'cartodb_map') {
+        echo '<div class="entry-content-asset hidden-print print-no">' . wp_oembed_get($d['cartodb_url']) . '</div>';
+        echo '<img class="visible-print-block" src="' . $d['static_map']['url'] . '" />';
+        $tweet = 'Explore ' . $title . ' & more -> ';
+      } elseif ($d['type'] == 'text') {
 
-      if (!stristr($content, 'wp-embedded-content') && !stristr($content, '<img')) {
-        $tweet = $title . ': ' . trim(strip_tags($content)) . '. More -> ';
-      } else {
-        $tweet = $title . ' & more -> ';
-      }
-    } ?>
-    <div class="meta">
-      <?php echo $d['notes']; ?>
+        echo $d['text-based_data'];
+
+        if (!stristr($content, 'wp-embedded-content') && !stristr($content, '<img')) {
+          $tweet = $title . ': ' . trim(strip_tags($content)) . '. More -> ';
+        } else {
+          $tweet = $title . ' & more -> ';
+        }
+      } ?>
+      <div class="meta">
+        <?php echo wpautop($d['notes']); ?>
+      </div>
+
+      <?php if (!empty($d['source'])) { ?>
+        <button class="btn btn-default hidden-print print-no" data-toggle="popover" data-container="body" data-placement="top" data-trigger="focus" title="Source" data-html="true" data-content="<?php echo str_replace('"', '\'', $d['source']); ?>">Explore this data</button>
+      <?php } ?>
+
+      <p class="meta visible-print-block">Source: <?php echo $source_plain; ?></p>
+
+      <?php include('social-share-embed.php'); ?>
+
     </div>
-
-    <?php if (!empty($d['source'])) { ?>
-      <button class="btn btn-default hidden-print print-no" data-toggle="popover" data-container="body" data-placement="top" data-trigger="focus" title="Source" data-html="true" data-content="<?php echo str_replace('"', '\'', $d['source']); ?>">Explore this data</button>
-    <?php } ?>
-
-    <p class="meta visible-print-block">Source: <?php echo $source_plain; ?></p>
-
-    <?php
-    $crunchifyURL = urlencode(get_permalink());
-    $crunchifyTweet = urlencode($tweet);
-    $twitterURL = 'https://twitter.com/intent/tweet?text='.$crunchifyTweet.'&amp;url='.$crunchifyURL;
-    $crunchifyEmailMsg = urlencode('Explore the ' . $title . ': ');
-
-    // include( locate_template('templates/components/social-share-embed.php') ); ?>
   </div>
 </div>

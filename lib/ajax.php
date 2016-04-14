@@ -2,6 +2,7 @@
 
 namespace Stringable\DataDash\Ajax;
 
+add_action( 'clean_post_cache', __NAMESPACE__ . '\\clear_dataviz_transients', 10, 2 );
 function clear_dataviz_transients($post_id, $post) {
   // HALP! I CAN'T GET THIS TO WORK!
   if ( 'data-viz' == $post->post_type )
@@ -10,9 +11,10 @@ function clear_dataviz_transients($post_id, $post) {
   delete_transient( 'viz_' . $post->post_name );
   delete_transient( 'viz_lg_' . $post->post_name );
 }
-add_action( 'clean_post_cache', __NAMESPACE__ . '\\clear_dataviz_transients', 10, 2 );
 
 
+add_action( 'wp_ajax_check_dataviz_transients', __NAMESPACE__ . '\\check_dataviz_transients_callback' );
+add_action( 'wp_ajax_nopriv_check_dataviz_transients', __NAMESPACE__ . '\\check_dataviz_transients_callback' );
 function check_dataviz_transients_callback() {
   check_ajax_referer( 'data-viz-ajax-nonce', 'security' );
 
@@ -27,10 +29,10 @@ function check_dataviz_transients_callback() {
   echo json_encode($response);
   die();
 }
-add_action( 'wp_ajax_check_dataviz_transients', __NAMESPACE__ . '\\check_dataviz_transients_callback' );
-add_action( 'wp_ajax_nopriv_check_dataviz_transients', __NAMESPACE__ . '\\check_dataviz_transients_callback' );
 
 
+add_action( 'wp_ajax_set_dataviz_transients', __NAMESPACE__ . '\\set_dataviz_transients_callback' );
+add_action( 'wp_ajax_nopriv_set_dataviz_transients', __NAMESPACE__ . '\\set_dataviz_transients_callback' );
 function set_dataviz_transients_callback() {
   check_ajax_referer( 'data-viz-ajax-nonce', 'security' );
 
@@ -39,15 +41,15 @@ function set_dataviz_transients_callback() {
   $viz = $_POST['viz'];
   $viz_lg = $_POST['viz_lg'];
 
-  set_transient( 'viz_' . $post_id, $viz, 1 * MINUTE_IN_SECONDS );
-  set_transient( 'viz_lg_' . $post_id, $viz_lg, 1 * MINUTE_IN_SECONDS );
+  set_transient( 'viz_' . $post_id, $viz, 1 * HOUR_IN_SECONDS );
+  set_transient( 'viz_lg_' . $post_id, $viz_lg, 1 * HOUR_IN_SECONDS );
 
   die();
 }
-add_action( 'wp_ajax_set_dataviz_transients', __NAMESPACE__ . '\\set_dataviz_transients_callback' );
-add_action( 'wp_ajax_nopriv_set_dataviz_transients', __NAMESPACE__ . '\\set_dataviz_transients_callback' );
 
 
+add_action( 'wp_ajax_save_png', __NAMESPACE__ . '\\save_png_callback' );
+add_action( 'wp_ajax_nopriv_save_png', __NAMESPACE__ . '\\save_png_callback' );
 function save_png_callback() {
   check_ajax_referer( 'data-viz-ajax-nonce', 'security' );
 
@@ -76,26 +78,26 @@ function save_png_callback() {
     set_transient( 'png_' . $post_id, $saved_png, 1 * MINUTE_IN_SECONDS );
 
     /**
-     * Annotated image with title, EdNC logo, and source
+     * Annotated image with title, logo, and source
      */
     // Set up  objects
-    $image = new Imagick($upload_dir['basedir'] . $filename);
-    $title = new ImagickDraw();
-    $logo = new Imagick(realpath(str_replace(get_bloginfo('url'), get_home_path(), get_site_icon_url(64))));
-    $source = new ImagickDraw();
+    $image = new \Imagick($upload_dir['basedir'] . $filename);
+    $title = new \ImagickDraw();
+    if (has_site_icon()) {
+      $logo = new \Imagick(realpath(str_replace(get_bloginfo('url'), get_home_path(), get_site_icon_url(64))));
+      $logo->adaptiveResizeImage(64, 64);
+    }
+    $source = new \ImagickDraw();
 
     // Add whitespace to top and bottom of image
     $image->borderImage('white', 0, 64);
 
     // Settings
     $title->setFillColor('black');  // Black text
-    $title->setFont('../wp-content/themes/ednc-2016/dist/fonts/Lato.ttf');
     $title->setFontSize(30);
     $title->setGravity(1);  // NORTHWEST
-    $source->setFillColor('#44474D');
-    $source->setFont('../wp-content/themes/ednc-2016/dist/fonts/Lato.ttf');
+    $source->setFillColor('#444444');
     $source->setFontSize(15);
-    $logo->adaptiveResizeImage(64, 64);
 
     // Make sure source text line wraps
     function wordWrapAnnotation($image, $draw, $text, $maxWidth) {
@@ -131,13 +133,13 @@ function save_png_callback() {
 
     // Generate new image and save it
     $image->annotateImage($title, 10, 10, 0, $post_title);
-    $image->compositeImage($logo, Imagick::COMPOSITE_DEFAULT, 0, 694);
-    $filename_ednc = '/data-viz/' . $post_id . '-ednc.png';
-    $success = $image->writeImage($upload_dir['basedir'] . $filename_ednc);
+    if (!empty($logo)) {
+      $image->compositeImage($logo, Imagick::COMPOSITE_DEFAULT, 0, 694);
+    }
+    $filename_annotated = '/data-viz/' . $post_id . '-annotated.png';
+    $success = $image->writeImage($upload_dir['basedir'] . $filename_annotated);
   }
 
   echo $saved_png;
   die();
 }
-add_action( 'wp_ajax_save_png', __NAMESPACE__ . '\\save_png_callback' );
-add_action( 'wp_ajax_nopriv_save_png', __NAMESPACE__ . '\\save_png_callback' );

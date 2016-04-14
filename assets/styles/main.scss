@@ -1,0 +1,88 @@
+// Automatically injected Bower dependencies via wiredep (never manually edit this block)
+// bower:scss
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+// endbower
+
+@import "icons";
+@import "loading";
+@import "social-share-buttons";
+
+.data-dashboard {
+  img {
+    max-width: 100%;
+  }
+
+  .append-on-affix {
+    display: none;
+    position: absolute;
+    bottom: -40px;
+    left: 10px;
+
+    a {
+      text-decoration: none;
+    }
+  }
+
+  .affix {
+    @media (min-width: $screen-md-min) {
+      top: 20px;
+      position: fixed;
+
+      .append-on-affix {
+        display: block;
+      }
+    }
+  }
+
+  .affix-bottom {
+    @media (min-width: $screen-md-min) {
+      position: absolute;
+
+      .append-on-affix {
+        display: block;
+      }
+    }
+  }
+
+  .nav {
+    li {
+      margin: 0;
+
+      li {
+        margin: 0;
+        display: block;
+
+        a {
+          list-style-type: square;
+          list-style-position: inside;
+          display: list-item;
+        }
+      }
+    }
+
+    a {
+      padding: 10px 5px 7px;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .children {
+      a {
+        padding-left: 20px;
+      }
+    }
+  }
+}
+
+.dashboard-section {
+  margin-bottom: 4em;
+}
+
+.data-section {
+  .fancy-number {
+    display: block;
+    line-height: 1em;
+    font-size: 48px;
+    transition: font-size .3s ease-in-out;
+  }
+}

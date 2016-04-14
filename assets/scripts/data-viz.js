@@ -1,93 +1,91 @@
 google.charts.load('current', {packages: ['corechart', 'table']});
 
 /**
- * Everything we need to load data visualizations
+ * For embeds: Send this document's height to the parent (embedding) site.
+ * The code for the next 3 functions were adapted from the default wp-embed-template.js file
  */
-(function ($) {
+var message, secret, secretTimeout;
+function sendEmbedMessage( message, value ) {
+	window.parent.postMessage( {
+		message: message,
+		value: value,
+		secret: secret
+	}, '*' );
+}
+function getSecret() {
+  if ( window.self === window.top || !!secret ) {
+   return;
+  }
 
-  // Merges two arrays
-  function extend(obj, src) {
-    for (var key in src) {
-      if (src.hasOwnProperty(key)) {
-        obj[key] = src[key];
-      }
+  secret = window.location.hash.replace( /.*secret=([\d\w]{10}).*/, '$1' );
+
+  clearTimeout( secretTimeout );
+
+  secretTimeout = setTimeout( function () {
+   getSecret();
+  }, 100 );
+}
+function setHeight() {
+  if ( window.self === window.top ) {
+  	return;
+  }
+  getSecret();
+
+  sendEmbedMessage( 'height', Math.ceil( document.body.getBoundingClientRect().height ) );
+}
+
+
+/**
+ * Load Google Charts
+ */
+jQuery(document).ready(function($) {
+  function initDashboard() {
+    // Kick scroll event
+    $(window).scroll();
+
+    if ($('body').hasClass('post-type-archive-data')) {
+
+      // Load each dashboard section one at a time
+      $('.dashboard-section').scrolledIntoView().on('scrolledin', function() {
+        $(this).initCharts();
+      });
+
+    } else {
+
+      // Load single data viz
+      $('.data-viz').initCharts();
+
     }
-    return obj;
   }
-
-  /**
-   * For embeds: Send this document's height to the parent (embedding) site.
-   * The code for the next 3 functions were adapted from the default wp-embed-template.js file
-   */
-  var message, secret, secretTimeout;
-  function sendEmbedMessage( message, value ) {
-  	window.parent.postMessage( {
-  		message: message,
-  		value: value,
-  		secret: secret
-  	}, '*' );
-  }
-  function getSecret() {
-    if ( window.self === window.top || !!secret ) {
-     return;
-    }
-
-    secret = window.location.hash.replace( /.*secret=([\d\w]{10}).*/, '$1' );
-
-    clearTimeout( secretTimeout );
-
-    secretTimeout = setTimeout( function () {
-     getSecret();
-    }, 100 );
-  }
-  function setHeight() {
-    if ( window.self === window.top ) {
-    	return;
-    }
-    getSecret();
-
-    sendEmbedMessage( 'height', Math.ceil( document.body.getBoundingClientRect().height ) );
-  }
+  google.charts.setOnLoadCallback(initDashboard);
+});
 
 
-  /**
-   * This function handles loading the charts
-   */
+/**
+ * This function handles initializing the charts
+ */
+(function( $ ) {
   $.fn.initCharts = function() {
 
-    // Loop through each data-viz on page
-    this.find('.data-section.has-data-viz').each(function() {
+    // Loop through each data-viz on page once
+    return this.find('.data-section.has-data-viz').not('[data-loaded]').each(function() {
+
       var chart, chart_lg,
           id = $(this).attr('id'),  // Unique ID for this data viz
           json = window[id];  // Data for chart passed from PHP
 
+
       /**
-       * Use AJAX to check WP Transients for cached charts data
+       * Merges two arrays
        */
-      var settings = {
-        action: 'check_dataviz_transients',
-        security: Ajax.security,
-        id: id
-      };
-
-      $.post(Ajax.ajaxurl, settings, function(response) {
-        response = JSON.parse(response);
-        if (response.viz) {
-          // Get data from transients and draw
-          viz = new google.visualization.ChartWrapper(response.viz.replace(/\\"/g, '"').replace(/\\'/g, '\''));
-          viz_lg = new google.visualization.ChartWrapper(response.viz_lg.replace(/\\"/g, '"').replace(/\\'/g, '\''));
-
-          // Make sure columns are properly included since toJSON() drops calculated columns for some unknown reason
-          var columns = eval(json.d.columns);
-          viz.setView({'columns' : columns});
-          viz_lg.setView({'columns' : columns});
-
-          drawCharts(viz, viz_lg);
-        } else {
-          // If no transient, use JS to get data and build chart
-          getViz();
+      function extend(obj, src) {
+        for (var key in src) {
+          if (src.hasOwnProperty(key)) {
+            obj[key] = src[key];
+          }
         }
-      });
+        return obj;
+      }
 
 
       /**
@@ -96,13 +94,15 @@ google.charts.load('current', {packages: ['corechart', 'table']});
       function setTransients(viz, viz_lg) {
         var settings = {
           action: 'set_dataviz_transients',
-          security: Ajax.security,
+          security: dd_ajax.security,
           id: id,
           viz: viz.toJSON(),
           viz_lg: viz_lg.toJSON()
         };
 
-        $.post(Ajax.ajaxurl, settings, function(response) {});
+        $.post(dd_ajax.ajaxurl, settings, function(response) {
+          // Function doesn't return anything on purpose
+        });
       }
 
 
@@ -116,6 +116,14 @@ google.charts.load('current', {packages: ['corechart', 'table']});
         // Draw large chart that image is generated from
         viz_lg.draw();
 
+        google.visualization.events.addListener(viz, 'ready', function() {
+          // Set data loaded attr
+          $('#' + id).attr('data-loaded', 'true');
+
+          // Fix iframe height after charts load (for embeds)
+          setHeight();
+        });
+
         google.visualization.events.addListener(viz_lg, 'ready', function () {
           // Get PNG image of large chart
           if (json.type !== 'Table') {
@@ -126,14 +134,14 @@ google.charts.load('current', {packages: ['corechart', 'table']});
             // Save PNG to server with AJAX
             var data = {
               action: 'save_png',
-              security: Ajax.security,
+              security: dd_ajax.security,
               png: chart_image,
               id: id,
               title: json.title,
               source: json.source
             };
 
-            $.post(Ajax.ajaxurl, data, function(response) {
+            $.post(dd_ajax.ajaxurl, data, function(response) {
               // Display image that was just saved to server
               $('#viz_png_' + id).html('<img src="' + response + '">');
             });
@@ -141,10 +149,8 @@ google.charts.load('current', {packages: ['corechart', 'table']});
             $('#viz_lg_' + id).hide();
           }
 
-          // For embeds: Fix iframe height after charts load
-          google.visualization.events.addListener(viz, 'ready', function(response) {
-            setHeight();
-          });
+          // Fix iframe height after charts load (for embeds)
+          setHeight();
 
           // Make sure charts and iframes they're embedded in are responsive
           $(window).resize(function() {
@@ -211,9 +217,37 @@ google.charts.load('current', {packages: ['corechart', 'table']});
         setTransients(viz, viz_lg);
       }
 
+
+      /**
+       * Use AJAX to check WP Transients for cached charts data
+       */
+      var settings = {
+        action: 'check_dataviz_transients',
+        security: dd_ajax.security,
+        id: id
+      };
+
+      $.post(dd_ajax.ajaxurl, settings, function(response) {
+        response = JSON.parse(response);
+
+        if (response.viz) {
+          // Get data from transients and draw
+          viz = new google.visualization.ChartWrapper(response.viz.replace(/\\"/g, '"').replace(/\\'/g, '\''));
+          viz_lg = new google.visualization.ChartWrapper(response.viz_lg.replace(/\\"/g, '"').replace(/\\'/g, '\''));
+
+          // Make sure columns are properly included since toJSON() drops calculated columns for some unknown reason
+          var columns = eval(json.d.columns);
+          viz.setView({'columns' : columns});
+          viz_lg.setView({'columns' : columns});
+
+          drawCharts(viz, viz_lg);
+        } else {
+          // If no transient, use JS to get data and build chart
+          getViz();
+        }
+      });
+
     });
 
-    return this;
   };
-
-})(jQuery);
+}( jQuery ));

@@ -3,20 +3,24 @@
     "main.js": {
       "files": [
         "scripts/vendor/*.js",
+        "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/tooltip.js",
+        "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/popover.js",
+        "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/scrollspy.js",
+        "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/affix.js",
+        "scripts/data-viz.js",
         "scripts/main.js"
-      ],
-      "main": true
+      ]
+    },
+    "boostrap.modal.js": {
+      "files": [
+        "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js"
+      ]
     },
     "main.css": {
       "files": [
         "styles/main.scss"
       ],
       "main": true
-    },
-    "data-viz.js": {
-      "files": [
-        "scripts/data-viz.js"
-      ]
     },
     "admin.css": {
       "files": [

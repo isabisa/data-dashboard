@@ -18,7 +18,7 @@ $prefix = '_dd_';
 <div class="container data-dashboard">
   <div class="row archive">
     <div class="col-md-3 hidden-xs hidden-sm">
-      <div class="callout" id="data-dash-nav">
+      <div class="well callout" id="data-dash-nav">
         <ul class="nav nav-stacked">
           <?php
           wp_list_pages([
@@ -29,6 +29,10 @@ $prefix = '_dd_';
           ])
           ?>
         </ul>
+
+        <div class="append-on-affix">
+          <a href="#">Back to top</a>
+        </div>
       </div>
     </div>
 
@@ -66,7 +70,7 @@ $prefix = '_dd_';
               $intro = get_post_meta( get_the_ID(), $prefix . 'intro', true );
               if (!empty($intro)) {
                 ?>
-                <div class="row intro-section">
+                <div class="row intro-section panel panel-default">
                   <div class="col-lg-11">
                     <?php echo $intro; ?>
                   </div>
