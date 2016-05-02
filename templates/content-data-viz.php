@@ -72,6 +72,26 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
 <div class="row data-section well <?php if (!empty($vars['type'])) echo 'has-data-viz'; ?>" id="<?php echo $post_name; ?>">
   <div class="col-md-3">
     <p class="no-bottom-margin"><?php the_title(); ?></p>
+    <?php
+    if (is_embed()) {
+      $site_title = sprintf(
+        '<a class="embed-credit" href="%s" target="_blank"><img src="%s" srcset="%s 2x" width="64" height="64" alt="%s" /></a>',
+        esc_url( get_the_permalink() ),
+        esc_url( get_site_icon_url( 64, admin_url( 'images/w-logo-blue.png' ) ) ),
+        esc_url( get_site_icon_url( 128, admin_url( 'images/w-logo-blue.png' ) ) ),
+        esc_html( get_bloginfo( 'name' ) )
+      );
+
+      /**
+       * Filter the site title HTML in the embed footer.
+       *
+       * @since 4.4.0
+       *
+       * @param string $site_title The site title HTML.
+       */
+      echo apply_filters( 'embed_site_title_html', $site_title );
+    }
+    ?>
   </div>
 
   <div class="col-md-9 panel panel-default">
@@ -80,7 +100,7 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
         if (!empty($d['data_source'])) {
           ?>
 
-          <div class="loading" id="viz_png_<?php echo $vars['post_name']; ?>">
+          <div class="loading print" id="viz_png_<?php echo $vars['post_name']; ?>">
             <?php
             $upload_dir = wp_upload_dir();
             $filename = '/data-viz/' . $post_name . '.png';
@@ -101,11 +121,11 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
 
           <?php
         }
-        $tweet = 'Explore ' . $title . ' & more -> ';
+        $tweet = 'Explore ' . $title . ' + more -> ';
       } elseif ($d['type'] == 'cartodb_map') {
         echo '<div class="entry-content-asset hidden-print print-no">' . wp_oembed_get($d['cartodb_url']) . '</div>';
         echo '<img class="visible-print-block" src="' . $d['static_map']['url'] . '" />';
-        $tweet = 'Explore ' . $title . ' & more -> ';
+        $tweet = 'Explore ' . $title . ' + more -> ';
       } elseif ($d['type'] == 'text') {
 
         echo $d['text-based_data'];
@@ -113,7 +133,7 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
         if (!stristr($content, 'wp-embedded-content') && !stristr($content, '<img')) {
           $tweet = $title . ': ' . trim(strip_tags($content)) . '. More -> ';
         } else {
-          $tweet = $title . ' & more -> ';
+          $tweet = $title . ' + more -> ';
         }
       } ?>
       <div class="meta">

@@ -48,7 +48,7 @@ if (!class_exists('Data_Dashboard')) {
       $upload_dir = $upload['basedir'];
       $upload_dir = $upload_dir . '/data-viz';
       if (! is_dir($upload_dir)) {
-         mkdir( $upload_dir, 0700 );
+         mkdir( $upload_dir, 0755 );
       }
     }
 

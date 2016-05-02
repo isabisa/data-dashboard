@@ -11,6 +11,11 @@
         "scripts/main.js"
       ]
     },
+    "wp-embed-template.js": {
+      "files": [
+        "scripts/wp-embed-template.js"
+      ]
+    },
     "boostrap.modal.js": {
       "files": [
         "../bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js"

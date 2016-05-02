@@ -108,10 +108,10 @@ function single_template($template) {
 /**
  * Default template for data viz embed
  */
-add_filter( 'embed_template', function($template) {
+add_filter( 'template_include', function($template) {
   global $post;
-	if ('data-viz' == get_post_type(get_queried_object_id()) && !$template) {
+	if ('data-viz' == get_post_type(get_queried_object_id()) && is_embed() && (is_object($template)) || strpos($template, 'wp-includes')) {
     $template = realpath(__DIR__ . '/..') . '/templates/embed-data-viz.php';
   }
 	return $template;
-});
+}, 110 );

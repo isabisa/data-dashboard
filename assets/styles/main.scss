@@ -1,6 +1,26 @@
 // Automatically injected Bower dependencies via wiredep (never manually edit this block)
 // bower:scss
-@import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_mixins.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_normalize.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_print.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_glyphicons.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_scaffolding.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_type.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_code.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_grid.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_tables.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_forms.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_buttons.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_panels.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_wells.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_close.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_modals.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_tooltip.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_popovers.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_carousel.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_utilities.scss";
+@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_responsive-utilities.scss";
 // endbower
 
 @import "icons";
@@ -27,6 +47,7 @@
     @media (min-width: $screen-md-min) {
       top: 20px;
       position: fixed;
+      max-width: 273px;
 
       .append-on-affix {
         display: block;
@@ -84,5 +105,43 @@
     line-height: 1em;
     font-size: 48px;
     transition: font-size .3s ease-in-out;
+  }
+
+  .print {
+    @media print {
+      display: block !important;
+    }
+  }
+
+  @media (min-width: $screen-md-min) {
+    display: flex;
+
+    .col-md-3 {
+      display: flex;
+    }
+  }
+
+  .embed-credit {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    width: 100px;
+
+    @media print {
+      &:after {
+        content: none !important;
+      }
+    }
+
+    img {
+      width: 100%;
+    }
+
+    @media (min-width: $screen-md-min) {
+      top: auto;
+      right: auto;
+      bottom: 0;
+      left: 0;
+    }
   }
 }

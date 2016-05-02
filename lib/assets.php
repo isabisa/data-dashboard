@@ -10,8 +10,8 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   wp_enqueue_style( 'dd_admin_style', plugin_dir_url(dirname(__FILE__)) . 'dist/styles/admin.css' );
 });
 
-// Enqueue front-end assets
-add_action('wp_enqueue_scripts', function() {
+// Enqueue assets
+function enqueue_scripts() {
   if (is_post_type_archive('data') || is_singular('data-viz')) {
     wp_enqueue_style( 'dd_main_style', plugin_dir_url(dirname(__FILE__)) . 'dist/styles/main.css' );
     wp_enqueue_script('dd_google_charts', '//www.gstatic.com/charts/loader.js', [], null, false);
@@ -21,28 +21,33 @@ add_action('wp_enqueue_scripts', function() {
       'security' => wp_create_nonce('data-viz-ajax-nonce')
     ));
   }
-}, 100);
-
-// Enqueue Bootstrap Modal if it's not already defined
-add_action('wp_footer', function() {
-  ?>
-  <script>if(typeof(jQuery.fn.modal) === 'undefined') {document.write('<script src="<?php echo plugin_dir_url(dirname(__FILE__)); ?>dist/scripts/boostrap.modal.js"><\/script>')}</script>
-  <?php
-});
-
-// // Enqueue embed assets
+}
+add_action('wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue_scripts', 100);
+add_action('enqueue_embed_scripts', __NAMESPACE__ . '\\enqueue_scripts', 100);
 remove_action( 'embed_head', 'print_emoji_detection_script' );
 remove_action( 'embed_head', 'print_emoji_styles' );
-// add_action('enqueue_embed_scripts', function() {
-//   wp_enqueue_style('sage/css', Assets\asset_path('styles/embed.css'), false, null);
-//   wp_enqueue_script('sage/js', Assets\asset_path('scripts/main.js'), ['jquery'], null, true);
-//
-//   if (is_singular('data-viz')) {
-//     wp_enqueue_script('google/charts', '//www.gstatic.com/charts/loader.js', [], null, false);
-//     wp_enqueue_script('data-viz', Assets\asset_path('scripts/data-viz.js'), ['jquery', 'google/charts'], null, false);
-//     wp_localize_script('data-viz', 'Ajax', array(
-//       'ajaxurl' => admin_url('admin-ajax.php'),
-//       'security' => wp_create_nonce('data-viz-ajax-nonce')
-//     ));
-//   }
-// }, 100);
+remove_action( 'embed_head', 'print_embed_styles' );
+
+// Enqueue Bootstrap Modal if it's not already defined
+function bootstrap_modal() {
+  if (is_post_type_archive('data') || is_singular('data-viz')) {
+    ?>
+    <script>
+    jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo plugin_dir_url(dirname(__FILE__)); ?>dist/scripts/boostrap.modal.js"><\/script>'))}});</script>
+    <?php
+  }
+}
+add_action('wp_footer', __NAMESPACE__ . '\\bootstrap_modal');
+add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
+
+/**
+ * Replace default inline embed scripts to remove default share fn code and allow links to open in new tabs
+ */
+remove_action( 'embed_footer', 'print_embed_scripts' );
+add_action( 'embed_footer', function() {
+	?>
+	<script type="text/javascript">
+	 <?php readfile( plugin_dir_url(dirname(__FILE__)) . 'dist/scripts/wp-embed-template.js' ); ?>
+	</script>
+	<?php
+} );

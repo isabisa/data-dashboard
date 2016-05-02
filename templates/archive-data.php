@@ -86,7 +86,7 @@ $prefix = '_dd_';
                   $post = get_post($d);
                   setup_postdata($post);
 
-                  include('content-embed-data-viz.php');
+                  include('content-data-viz.php');
 
                   $post = $original_post;
                   wp_reset_postdata();

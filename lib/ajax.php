@@ -20,8 +20,8 @@ function check_dataviz_transients_callback() {
 
   $post_id = $_POST['id'];
 
-  // delete_transient( 'viz_' . $post_id );
-  // delete_transient( 'viz_lg_' . $post_id );
+  delete_transient( 'viz_' . $post_id );
+  delete_transient( 'viz_lg_' . $post_id );
 
   $response['viz'] = utf8_encode(get_transient( 'viz_' . $post_id ));
   $response['viz_lg'] = utf8_encode(get_transient( 'viz_lg_' . $post_id ));
@@ -134,7 +134,7 @@ function save_png_callback() {
     // Generate new image and save it
     $image->annotateImage($title, 10, 10, 0, $post_title);
     if (!empty($logo)) {
-      $image->compositeImage($logo, Imagick::COMPOSITE_DEFAULT, 0, 694);
+      $image->compositeImage($logo, \Imagick::COMPOSITE_DEFAULT, 0, 694);
     }
     $filename_annotated = '/data-viz/' . $post_id . '-annotated.png';
     $success = $image->writeImage($upload_dir['basedir'] . $filename_annotated);

@@ -53,7 +53,7 @@ jQuery(document).ready(function($) {
     } else {
 
       // Load single data viz
-      $('.data-viz').initCharts();
+      $('.data-dashboard').initCharts();
 
     }
   }
