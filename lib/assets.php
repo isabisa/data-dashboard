@@ -2,6 +2,61 @@
 
 namespace Stringable\DataDash\Assets;
 
+/**
+ * Get paths for assets
+ */
+class JsonManifest {
+  private $manifest;
+
+  public function __construct($manifest_path) {
+    if (file_exists($manifest_path)) {
+      $this->manifest = json_decode(file_get_contents($manifest_path), true);
+    } else {
+      $this->manifest = [];
+    }
+  }
+
+  public function get() {
+    return $this->manifest;
+  }
+
+  public function getPath($key = '', $default = null) {
+    $collection = $this->manifest;
+    if (is_null($key)) {
+      return $collection;
+    }
+    if (isset($collection[$key])) {
+      return $collection[$key];
+    }
+    foreach (explode('.', $key) as $segment) {
+      if (!isset($collection[$segment])) {
+        return $default;
+      } else {
+        $collection = $collection[$segment];
+      }
+    }
+    return $collection;
+  }
+}
+
+function asset_path($filename) {
+  $dist_path = plugin_dir_url(dirname(__FILE__)) . 'dist/';
+  $directory = dirname($filename) . '/';
+  $file = basename($filename);
+  static $manifest;
+
+  if (empty($manifest)) {
+    $manifest_path = plugin_dir_path(dirname(__FILE__)) . 'dist/' . 'assets.json';
+    $manifest = new namespace\JsonManifest($manifest_path);
+  }
+
+  if (array_key_exists($file, $manifest->get())) {
+    return $dist_path . $directory . $manifest->get()[$file];
+  } else {
+    return $dist_path . $directory . $file;
+  }
+}
+
 // Enqueue admin styles
 add_action( 'admin_enqueue_scripts', function($hook) {
   if( $hook != 'post.php' && $hook != 'post-new.php' )
@@ -13,9 +68,9 @@ add_action( 'admin_enqueue_scripts', function($hook) {
 // Enqueue assets
 function enqueue_scripts() {
   if (is_post_type_archive('data') || is_singular('data-viz')) {
-    wp_enqueue_style( 'dd_main_style', plugin_dir_url(dirname(__FILE__)) . 'dist/styles/main.css' );
+    wp_enqueue_style( 'dd_main_style', namespace\asset_path('styles/main.css') );
     wp_enqueue_script('dd_google_charts', '//www.gstatic.com/charts/loader.js', [], null, false);
-    wp_enqueue_script('dd_main_scripts', plugin_dir_url(dirname(__FILE__)) . 'dist/scripts/main.js', ['jquery', 'dd_google_charts'], null, true);
+    wp_enqueue_script('dd_main_scripts', namespace\asset_path('scripts/main.js'), ['jquery', 'dd_google_charts'], null, true);
     wp_localize_script( 'dd_main_scripts', 'dd_ajax', array(
       'ajaxurl' => admin_url('admin-ajax.php'),
       'security' => wp_create_nonce('data-viz-ajax-nonce')
