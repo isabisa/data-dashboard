@@ -88,7 +88,7 @@ function bootstrap_modal() {
   if (is_post_type_archive('data') || is_singular('data-viz')) {
     ?>
     <script>
-    jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo plugin_dir_url(dirname(__FILE__)); ?>dist/scripts/boostrap.modal.js"><\/script>'))}});</script>
+    jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo namespace\asset_path('scripts/boostrap.modal.js'); ?>"><\/script>'))}});</script>
     <?php
   }
 }
