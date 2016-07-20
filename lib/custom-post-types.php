@@ -84,7 +84,7 @@ function register_post_types() {
 add_filter( 'archive_template', __NAMESPACE__ . '\\archive_template' );
 function archive_template($template) {
 	global $post;
-	if ( is_post_type_archive ( 'data' ) && !$template) {
+	if ( is_post_type_archive ( 'data' ) && (!$template || strpos($template, 'archive.php') !== false) ) {
 		$template = realpath(__DIR__ . '/..') . '/templates/archive-data.php';
 	}
 	return $template;
