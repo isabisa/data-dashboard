@@ -62,7 +62,7 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   if( $hook != 'post.php' && $hook != 'post-new.php' )
     return;
 
-  wp_enqueue_style( 'dd_admin_style', plugin_dir_url(dirname(__FILE__)) . 'dist/styles/admin.css' );
+  wp_enqueue_style( 'dd_admin_style', namespace\asset_path('styles/admin.css') );
 });
 
 // Enqueue assets
@@ -83,17 +83,24 @@ remove_action( 'embed_head', 'print_emoji_detection_script' );
 remove_action( 'embed_head', 'print_emoji_styles' );
 remove_action( 'embed_head', 'print_embed_styles' );
 
+// Add social media metadata to head of dashboard
+function social_meta() {
+  if (is_post_type_archive('data')) {
+    include_once(plugin_dir_path(dirname(__FILE__)) . 'templates/social-meta.php');
+  }
+}
+add_action('wp_head', __NAMESPACE__ . '\\social_meta');
+
 // Enqueue Bootstrap Modal if it's not already defined
 function bootstrap_modal() {
   if (is_post_type_archive('data') || is_singular('data-viz')) {
     ?>
-    <script>
-    jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo plugin_dir_url(dirname(__FILE__)); ?>dist/scripts/boostrap.modal.js"><\/script>'))}});</script>
+    <script>jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo namespace\asset_path('scripts/boostrap.modal.js'); ?>"><\/script>'))}});</script>
     <?php
   }
 }
-add_action('wp_footer', __NAMESPACE__ . '\\bootstrap_modal');
-add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
+// add_action('wp_footer', __NAMESPACE__ . '\\bootstrap_modal');
+// add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
 
 /**
  * Replace default inline embed scripts to remove default share fn code and allow links to open in new tabs
@@ -101,8 +108,8 @@ add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
 remove_action( 'embed_footer', 'print_embed_scripts' );
 add_action( 'embed_footer', function() {
 	?>
-	<script type="text/javascript">
-	 <?php readfile( plugin_dir_url(dirname(__FILE__)) . 'dist/scripts/wp-embed-template.js' ); ?>
+	<script type="text/javascript" id="new">
+	 <?php readfile( namespace\asset_path('scripts/wp-embed-template.js') ); ?>
 	</script>
 	<?php
 } );

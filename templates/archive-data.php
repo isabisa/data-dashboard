@@ -72,7 +72,7 @@ $prefix = '_dd_';
                 ?>
                 <div class="row intro-section panel panel-default">
                   <div class="col-lg-11">
-                    <?php echo $intro; ?>
+                    <?php echo apply_filters('the_content', $intro); ?>
                   </div>
                 </div>
                 <?php

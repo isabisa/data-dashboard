@@ -11,7 +11,7 @@ $d = [
   'options' => get_post_meta( $id, $prefix . 'options', true),
   'columns' => get_post_meta( $id, $prefix . 'columns', true),
   'cartodb_url' => get_post_meta( $id, $prefix . 'cartodb_url', true),
-  'static_map' => get_post_meta( $id, $prefix . 'static_map', true),
+  'static_map' => get_post_meta( $id, $prefix . 'static_map_image', true),
   'text-based_data' => get_post_meta( $id, $prefix . 'text-based_data', true),
   'notes' => get_post_meta( $id, $prefix . 'notes', true),
   'source' => get_post_meta( $id, $prefix . 'source', true),
@@ -124,7 +124,7 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
         $tweet = 'Explore ' . $title . ' + more -> ';
       } elseif ($d['type'] == 'cartodb_map') {
         echo '<div class="entry-content-asset hidden-print print-no">' . wp_oembed_get($d['cartodb_url']) . '</div>';
-        echo '<img class="visible-print-block" src="' . $d['static_map']['url'] . '" />';
+        echo '<img class="visible-print-block" src="' . $d['static_map'] . '" />';
         $tweet = 'Explore ' . $title . ' + more -> ';
       } elseif ($d['type'] == 'text') {
 

@@ -84,7 +84,7 @@ function register_post_types() {
 add_filter( 'archive_template', __NAMESPACE__ . '\\archive_template' );
 function archive_template($template) {
 	global $post;
-	if ( is_post_type_archive ( 'data' ) && !$template) {
+	if ( is_post_type_archive ( 'data' ) && (!$template || strpos($template, 'archive.php') !== false) ) {
 		$template = realpath(__DIR__ . '/..') . '/templates/archive-data.php';
 	}
 	return $template;
@@ -110,7 +110,7 @@ function single_template($template) {
  */
 add_filter( 'template_include', function($template) {
   global $post;
-	if ('data-viz' == get_post_type(get_queried_object_id()) && is_embed() && (is_object($template)) || strpos($template, 'wp-includes')) {
+	if ('data-viz' == get_post_type(get_queried_object_id()) && is_embed() && (is_object($template)) || strpos($template, 'wp-includes' || strpos($template, 'themes'))) {
     $template = realpath(__DIR__ . '/..') . '/templates/embed-data-viz.php';
   }
 	return $template;
