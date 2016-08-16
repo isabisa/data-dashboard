@@ -21,7 +21,7 @@ namespace Stringable\DataDash\Extras;
  * Add CartoDB oembed support
  */
 add_action('init', function() {
-  wp_oembed_add_provider( '#https?://(?:www\.)?[^/^\.]+\.cartodb\.com/\S+#i', 'https://services.cartodb.com/oembed', true );
+  wp_oembed_add_provider( '#https?://(?:www\.)?[^/^\.]+\.cartodb\.com/\S+#i', 'http://educationnc.cartodb.com/api/v1/oembed', true );
 });
 
 

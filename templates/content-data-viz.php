@@ -122,13 +122,16 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
           <?php
         }
         $tweet = 'Explore ' . $title . ' + more -> ';
+
       } elseif ($d['type'] == 'cartodb_map') {
+
         echo '<div class="entry-content-asset hidden-print print-no">' . wp_oembed_get($d['cartodb_url']) . '</div>';
         echo '<img class="visible-print-block" src="' . $d['static_map'] . '" />';
         $tweet = 'Explore ' . $title . ' + more -> ';
+
       } elseif ($d['type'] == 'text') {
 
-        echo $d['text-based_data'];
+        echo apply_filters('the_content', $d['text-based_data']);
 
         if (!stristr($content, 'wp-embedded-content') && !stristr($content, '<img')) {
           $tweet = $title . ': ' . trim(strip_tags($content)) . '. More -> ';

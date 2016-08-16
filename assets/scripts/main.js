@@ -14,6 +14,12 @@ jQuery(document).ready(function($) {
   // Make sure WordPress embeds have correct permissions
   $('iframe.wp-embedded-content').attr('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
 
+  // Add external-link icon to EdNC map embeds
+  $('iframe[src*="//www.ednc.org"]').each(function() {
+    var href = $(this).attr('src');
+    $(this).after('<a class="icon-external-link" href="' + href + '" target="_blank"></a>');
+  });
+
   // If 'print' URL parameter exists, open print dialog on page load
   if (window.location.search === '?print') {
     window.onload = function() { window.print(); };
