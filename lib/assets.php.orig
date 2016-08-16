@@ -95,12 +95,16 @@ add_action('wp_head', __NAMESPACE__ . '\\social_meta');
 function bootstrap_modal() {
   if (is_post_type_archive('data') || is_singular('data-viz')) {
     ?>
+<<<<<<< HEAD
+    <script>jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo namespace\asset_path('scripts/boostrap.modal.js'); ?>"><\/script>'))}});</script>
+=======
     <script>jQuery(document).ready(function($) {if(typeof(jQuery.fn.modal) === 'undefined') {$('body').append($('<script src="<?php echo namespace\asset_path('scripts/bootstrap.modal.js'); ?>"><\/script>'))}});</script>
+>>>>>>> b8ae44a02474845ad2e007561712846d3978edc3
     <?php
   }
 }
-add_action('wp_footer', __NAMESPACE__ . '\\bootstrap_modal');
-add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
+// add_action('wp_footer', __NAMESPACE__ . '\\bootstrap_modal');
+// add_action('embed_footer', __NAMESPACE__ . '\\bootstrap_modal');
 
 /**
  * Replace default inline embed scripts to remove default share fn code and allow links to open in new tabs
