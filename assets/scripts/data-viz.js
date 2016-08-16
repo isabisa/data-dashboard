@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
     return this.find('.data-section.has-data-viz').not('[data-loaded]').each(function() {
 
       var chart, chart_lg,
-          id = $(this).attr('id'),  // Unique ID for this data viz
+          id = $(this).attr('id').replace(/-/g, '_'),  // Unique ID for this data viz
           json = window[id];  // Data for chart passed from PHP
 
 
