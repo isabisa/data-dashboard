@@ -3,7 +3,7 @@
 $id = get_the_ID();
 $title = get_the_title();
 $permalink = get_the_permalink();
-$post_name = str_replace('-', '_', $post->post_name);
+$post_name = $post->post_name;
 $prefix = '_dd_';
 $d = [
   'type' => get_post_meta( $id, $prefix . 'type', true),
@@ -39,7 +39,7 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
   // Create array to hold everything that will be passed to JS
   $vars = [
     'title' => $title,
-    'post_name' => $post_name,
+    'post_name' => str_replace('-', '_', $post_name),
     'source' => $source_plain,
     'd' => $d
   ];
@@ -103,7 +103,7 @@ if ($d['type'] == 'bar_chart' || $d['type'] == 'scatter_chart' || $d['type'] == 
           <div class="loading print" id="viz_png_<?php echo $vars['post_name']; ?>">
             <?php
             $upload_dir = wp_upload_dir();
-            $filename = '/data-viz/' . $post_name . '.png';
+            $filename = '/data-viz/' . str_replace('-', '_', $post_name) . '.png';
             if (file_exists($upload_dir['basedir'] . $filename)) {
               echo '<img src="' . $upload_dir['baseurl'] . $filename . '" />';
             }

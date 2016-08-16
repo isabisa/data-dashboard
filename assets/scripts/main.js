@@ -16,6 +16,7 @@ jQuery(document).ready(function($) {
 
   // Add external-link icon to EdNC map embeds
   $('iframe[src*="//www.ednc.org"]').each(function() {
+    console.log('???');
     var href = $(this).attr('src');
     $(this).after('<a class="icon-external-link" href="' + href + '" target="_blank"></a>');
   });

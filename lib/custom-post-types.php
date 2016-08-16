@@ -81,29 +81,25 @@ function register_post_types() {
 /**
  * Default template for archive page
  */
-add_filter( 'archive_template', __NAMESPACE__ . '\\archive_template' );
-function archive_template($template) {
+add_filter( 'archive_template', function($template) {
 	global $post;
 	if ( is_post_type_archive ( 'data' ) && (!$template || strpos($template, 'archive.php') !== false) ) {
 		$template = realpath(__DIR__ . '/..') . '/templates/archive-data.php';
 	}
 	return $template;
-}
+});
 
 /**
  * Default template for single data section & single data viz
  */
-add_filter('single_template', __NAMESPACE__ . '\\single_template');
-function single_template($template) {
+add_filter('single_template', function($template) {
 	global $post;
-  if ('data' == get_post_type(get_queried_object_id()) && !$template) {
-    $template = realpath(__DIR__ . '/..') . '/templates/single-data.php';
-  }
-  elseif ('data-viz' == get_post_type(get_queried_object_id()) && !$template) {
-    $template = realpath(__DIR__ . '/..') . '/templates/single-data-viz.php';
+	$post_type = get_post_type(get_queried_object_id());
+  if ( ($post_type == 'data' || $post_type == 'data-viz') && (!$template || strpos($template, 'single.php') !== false) ) {
+    $template = realpath(__DIR__ . '/..') . '/templates/redirect-single.php';
   }
   return $template;
-}
+});
 
 /**
  * Default template for data viz embed
